@@ -1,9 +1,10 @@
-import { livro } from "../models/book.js"
+import { book } from "../models/book.js"
+import { author } from "../models/author.js"
 
 export class BookController {
   static async listBooks(_, response) {
     try {
-      const books = await livro.find({})
+      const books = await book.find({})
 
       response.status(200).json(books)
     } catch (error) {
@@ -16,7 +17,7 @@ export class BookController {
   static async getOneBook(request, response) {
     try {
       const id = request.params.id
-      const book = await livro.findById(id)
+      const book = await book.findById(id)
 
       response.status(200).json(book)
     } catch (error) {
@@ -26,9 +27,32 @@ export class BookController {
     }
   }
 
+  static async listBooksByPublisher(request, response) {
+    try {
+      const publisher = request.query.publisher
+
+      const booksByPublisher = await book.find({ editora: publisher })
+
+      response.status(200).json(booksByPublisher)
+    } catch (error) {
+      response.status(500).json({
+        message: `${error.message} - falha ao buscar os livros`,
+      })
+    }
+  }
+
   static async createBook(request, response) {
     try {
-      const newBook = await livro.create(request.body)
+      const bookData = request.body
+
+      const authorFind = await author.findById(bookData.author)
+
+      if (!authorFind) {
+        throw "Autor não encontrado"
+      }
+
+      const newRest = { ...bookData, autor: { ...authorFind._doc } }
+      const newBook = await book.create(newRest)
 
       response.status(201).json({
         message: "Livro criado com sucesso",
@@ -44,7 +68,7 @@ export class BookController {
   static async updateBook(request, response) {
     try {
       const id = request.params.id
-      await livro.findByIdAndUpdate(id, request.body)
+      await book.findByIdAndUpdate(id, request.body)
 
       response.status(201).json({
         message: "Livro atualizado com sucesso",
@@ -59,7 +83,7 @@ export class BookController {
   static async deleteBook(request, response) {
     try {
       const id = request.params.id
-      await livro.findByIdAndDelete(id, request.body)
+      await book.findByIdAndDelete(id, request.body)
 
       response.status(201).json({
         message: "Livro deletado com sucesso",

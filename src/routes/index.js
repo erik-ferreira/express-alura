@@ -7,6 +7,5 @@ export const routes = (app) => {
     return res.status(200).send("Curso de node.js")
   })
 
-  app.use(express.json(), bookRoutes)
-  app.use(express.json(), authorRoutes)
+  app.use(express.json(), bookRoutes, authorRoutes)
 }
