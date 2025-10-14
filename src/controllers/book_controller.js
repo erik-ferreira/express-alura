@@ -2,32 +2,28 @@ import { book } from "../models/book.js"
 import { author } from "../models/author.js"
 
 export class BookController {
-  static async listBooks(_, response) {
+  static async listBooks(_, response, next) {
     try {
       const books = await book.find({})
 
       response.status(200).json(books)
     } catch (error) {
-      response.status(500).json({
-        message: `${error.message} - falha ao buscar os livros`,
-      })
+      next(error)
     }
   }
 
-  static async getOneBook(request, response) {
+  static async getOneBook(request, response, next) {
     try {
       const id = request.params.id
       const book = await book.findById(id)
 
       response.status(200).json(book)
     } catch (error) {
-      response.status(500).json({
-        message: `${error.message} - falha ao buscar o livro`,
-      })
+      next(error)
     }
   }
 
-  static async listBooksByPublisher(request, response) {
+  static async listBooksByPublisher(request, response, next) {
     try {
       const publisher = request.query.publisher
 
@@ -35,13 +31,11 @@ export class BookController {
 
       response.status(200).json(booksByPublisher)
     } catch (error) {
-      response.status(500).json({
-        message: `${error.message} - falha ao buscar os livros`,
-      })
+      next(error)
     }
   }
 
-  static async createBook(request, response) {
+  static async createBook(request, response, next) {
     try {
       const bookData = request.body
 
@@ -59,13 +53,11 @@ export class BookController {
         book: newBook,
       })
     } catch (error) {
-      response.status(500).json({
-        message: `${error.message} - falha ao cadastrar o livro`,
-      })
+      next(error)
     }
   }
 
-  static async updateBook(request, response) {
+  static async updateBook(request, response, next) {
     try {
       const id = request.params.id
       await book.findByIdAndUpdate(id, request.body)
@@ -74,13 +66,11 @@ export class BookController {
         message: "Livro atualizado com sucesso",
       })
     } catch (error) {
-      response.status(500).json({
-        message: `${error.message} - falha ao atualizar o livro`,
-      })
+      next(error)
     }
   }
 
-  static async deleteBook(request, response) {
+  static async deleteBook(request, response, next) {
     try {
       const id = request.params.id
       await book.findByIdAndDelete(id, request.body)
@@ -89,9 +79,7 @@ export class BookController {
         message: "Livro deletado com sucesso",
       })
     } catch (error) {
-      response.status(500).json({
-        message: `${error.message} - falha ao deletar o livro`,
-      })
+      next(error)
     }
   }
 }

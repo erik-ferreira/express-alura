@@ -1,32 +1,33 @@
+import mongoose from "mongoose"
 import { author } from "../models/author.js"
 
 export class AuthorController {
-  static async listAuthors(_, response) {
+  static async listAuthors(_, response, next) {
     try {
       const authors = await author.find({})
 
       response.status(200).json(authors)
     } catch (error) {
-      response.status(500).json({
-        message: `${error.message} - falha ao buscar os autores`,
-      })
+      next(error)
     }
   }
 
-  static async getOneAuthor(request, response) {
+  static async getOneAuthor(request, response, next) {
     try {
       const id = request.params.id
-      const author = await author.findById(id)
+      const authorFind = await author.findById(id)
 
-      response.status(200).json(author)
+      if (!authorFind) {
+        return response.status(404).json({ message: "Autor não encontrado" })
+      }
+
+      response.status(200).json(authorFind)
     } catch (error) {
-      response.status(500).json({
-        message: `${error.message} - falha ao buscar o autor`,
-      })
+      next(error)
     }
   }
 
-  static async createAuthor(request, response) {
+  static async createAuthor(request, response, next) {
     try {
       const newAuthor = await author.create(request.body)
 
@@ -35,13 +36,11 @@ export class AuthorController {
         author: newAuthor,
       })
     } catch (error) {
-      response.status(500).json({
-        message: `${error.message} - falha ao cadastrar o autor`,
-      })
+      next(error)
     }
   }
 
-  static async updateAuthor(request, response) {
+  static async updateAuthor(request, response, next) {
     try {
       const id = request.params.id
       await author.findByIdAndUpdate(id, request.body)
@@ -50,13 +49,11 @@ export class AuthorController {
         message: "Autor atualizado com sucesso",
       })
     } catch (error) {
-      response.status(500).json({
-        message: `${error.message} - falha ao atualizar o autor`,
-      })
+      next(error)
     }
   }
 
-  static async deleteAuthor(request, response) {
+  static async deleteAuthor(request, response, next) {
     try {
       const id = request.params.id
       await author.findByIdAndDelete(id, request.body)
@@ -65,9 +62,7 @@ export class AuthorController {
         message: "Autor deletado com sucesso",
       })
     } catch (error) {
-      response.status(500).json({
-        message: `${error.message} - falha ao deletar o autor`,
-      })
+      next(error)
     }
   }
 }
