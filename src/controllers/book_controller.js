@@ -60,7 +60,12 @@ export class BookController {
   static async updateBook(request, response, next) {
     try {
       const id = request.params.id
-      await book.findByIdAndUpdate(id, request.body)
+      const bookResult = await book.findByIdAndUpdate(id, request.body)
+
+      if (!bookResult) {
+        next(new NotFound("Id do Livro não localizado."))
+        return
+      }
 
       response.status(201).json({
         message: "Livro atualizado com sucesso",
@@ -73,7 +78,12 @@ export class BookController {
   static async deleteBook(request, response, next) {
     try {
       const id = request.params.id
-      await book.findByIdAndDelete(id, request.body)
+      const bookResult = await book.findByIdAndDelete(id, request.body)
+
+      if (!bookResult) {
+        next(new NotFound("Id do Livro não localizado."))
+        return
+      }
 
       response.status(201).json({
         message: "Livro deletado com sucesso",

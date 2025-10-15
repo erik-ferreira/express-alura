@@ -1,5 +1,6 @@
 import mongoose from "mongoose"
 import { author } from "../models/author.js"
+import { NotFound } from "../errors/NotFound.js"
 
 export class AuthorController {
   static async listAuthors(_, response, next) {
@@ -18,7 +19,8 @@ export class AuthorController {
       const authorFind = await author.findById(id)
 
       if (!authorFind) {
-        return response.status(404).json({ message: "Autor não encontrado" })
+        // return response.status(404).json({ message: "Autor não encontrado" })
+        return next(new NotFound("Autor não encontrado"))
       }
 
       response.status(200).json(authorFind)
@@ -43,7 +45,12 @@ export class AuthorController {
   static async updateAuthor(request, response, next) {
     try {
       const id = request.params.id
-      await author.findByIdAndUpdate(id, request.body)
+      const authorResult = await author.findByIdAndUpdate(id, request.body)
+
+      if (!authorResult) {
+        next(new NotFound("Id do Autor não localizado."))
+        return
+      }
 
       response.status(201).json({
         message: "Autor atualizado com sucesso",
@@ -56,7 +63,12 @@ export class AuthorController {
   static async deleteAuthor(request, response, next) {
     try {
       const id = request.params.id
-      await author.findByIdAndDelete(id, request.body)
+      const authorResult = await author.findByIdAndDelete(id, request.body)
+
+      if (!authorResult) {
+        next(new NotFound("Id do Autor não localizado."))
+        return
+      }
 
       response.status(201).json({
         message: "Autor deletado com sucesso",
