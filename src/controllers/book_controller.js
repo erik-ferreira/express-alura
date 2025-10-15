@@ -23,11 +23,19 @@ export class BookController {
     }
   }
 
-  static async listBooksByPublisher(request, response, next) {
+  static async listBooksByFilter(request, response, next) {
     try {
-      const publisher = request.query.publisher
+      const { publisher, title } = request.query
 
-      const booksByPublisher = await book.find({ editora: publisher })
+      const search = {}
+
+      if (publisher) search.publisher = publisher
+      if (title) search.title = { $regex: title, $options: "i" }
+
+      const booksByPublisher = await book.find({
+        editora: search.publisher,
+        titulo: search.title,
+      })
 
       response.status(200).json(booksByPublisher)
     } catch (error) {
