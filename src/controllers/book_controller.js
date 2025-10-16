@@ -1,6 +1,8 @@
 import { book } from "../models/book.js"
 import { author } from "../models/author.js"
 
+import { processBooks } from "../utils/book.js"
+
 export class BookController {
   static async listBooks(_, response, next) {
     try {
@@ -25,17 +27,16 @@ export class BookController {
 
   static async listBooksByFilter(request, response, next) {
     try {
-      const { publisher, title } = request.query
+      const search = await processBooks(request.query)
 
-      const search = {}
-
-      if (publisher) search.publisher = publisher
-      if (title) search.title = { $regex: title, $options: "i" }
-
-      const booksByPublisher = await book.find({
-        editora: search.publisher,
-        titulo: search.title,
-      })
+      const booksByPublisher = await book
+        .find({
+          editora: search.publisher,
+          titulo: search.title,
+          paginas: search.pages,
+          autor: search.author,
+        })
+        .populate("autor")
 
       response.status(200).json(booksByPublisher)
     } catch (error) {
