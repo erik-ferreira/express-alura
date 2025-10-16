@@ -1,7 +1,7 @@
 import { book } from "../models/book.js"
 import { author } from "../models/author.js"
 
-import { processBooks } from "../utils/book.js"
+// import { processBooks } from "../utils/books.js"
 
 export class BookController {
   static async listBooks(_, response, next) {
@@ -27,18 +27,23 @@ export class BookController {
 
   static async listBooksByFilter(request, response, next) {
     try {
-      const search = await processBooks(request.query)
+      // const search = await processBooks(request.query)
 
-      const booksByPublisher = await book
-        .find({
-          editora: search.publisher,
-          titulo: search.title,
-          paginas: search.pages,
-          autor: search.author,
-        })
-        .populate("autor")
+      // if (search !== null) {
+      //   const booksByPublisher = await book
+      //     .find({
+      //       editora: search.publisher,
+      //       titulo: search.title,
+      //       paginas: search.pages,
+      //       autor: search.author,
+      //     })
+      //     .populate("autor")
 
-      response.status(200).json(booksByPublisher)
+      //   response.status(200).json(booksByPublisher)
+      // } else {
+      //   response.status(200).json([])
+      // }
+      response.status(200).json([])
     } catch (error) {
       next(error)
     }
