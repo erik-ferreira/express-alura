@@ -22,8 +22,6 @@ const bookSchema = new mongoose.Schema(
     },
     paginas: {
       type: Number,
-      // min: [10, "Número mínimo de páginas é 10"],
-      // max: [5000, "Número máximo de páginas é 5000"],
       validate: {
         validator: (valor) => valor >= 10 && valor <= 5000,
         message: "Número de páginas deve estar entre 10 e 5000",

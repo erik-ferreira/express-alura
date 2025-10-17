@@ -27,23 +27,22 @@ export class BookController {
 
   static async listBooksByFilter(request, response, next) {
     try {
-      // const search = await processBooks(request.query)
+      const search = await processBooks(request.query)
 
-      // if (search !== null) {
-      //   const booksByPublisher = await book
-      //     .find({
-      //       editora: search.publisher,
-      //       titulo: search.title,
-      //       paginas: search.pages,
-      //       autor: search.author,
-      //     })
-      //     .populate("autor")
+      if (search !== null) {
+        const booksByPublisher = await book
+          .find({
+            editora: search.publisher,
+            titulo: search.title,
+            paginas: search.pages,
+            autor: search.author,
+          })
+          .populate("autor")
 
-      //   response.status(200).json(booksByPublisher)
-      // } else {
-      //   response.status(200).json([])
-      // }
-      response.status(200).json([])
+        response.status(200).json(booksByPublisher)
+      } else {
+        response.status(200).json([])
+      }
     } catch (error) {
       next(error)
     }
