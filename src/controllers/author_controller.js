@@ -3,11 +3,13 @@ import { author } from "../models/author.js"
 import { NotFound } from "../errors/NotFound.js"
 
 export class AuthorController {
-  static async listAuthors(_, response, next) {
+  static async listAuthors(request, response, next) {
     try {
-      const authors = await author.find({})
+      const authors = author.find({})
 
-      response.status(200).json(authors)
+      request.result = authors
+
+      next()
     } catch (error) {
       next(error)
     }

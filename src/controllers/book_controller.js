@@ -1,31 +1,14 @@
 import { book } from "../models/book.js"
 import { author } from "../models/author.js"
 
-import { ErrorRequest } from "../errors/ErrorRequest.js"
-
 export class BookController {
-  static async listBooks(_, response, next) {
+  static async listBooks(request, response, next) {
     try {
-      const { take = 5, page = 1, ordination = "_id:-1" } = request.query
-      const [order, ordem] = ordination.split(":")
+      const searchBooks = livros.find()
 
-      take = parseInt(take)
-      page = parseInt(page)
-      ordem = parseInt(ordem)
+      request.result = searchBooks
 
-      if (take > 0 && page > 0) {
-        const books = await book
-          .find({})
-          .sort({ [order]: ordem })
-          .skip((page - 1) * take)
-          .limit(take)
-          .populate("autor")
-          .exec()
-
-        return response.status(200).json(books)
-      }
-
-      next(new ErrorRequest())
+      next()
     } catch (error) {
       next(error)
     }
@@ -47,7 +30,7 @@ export class BookController {
       const search = await processBooks(request.query)
 
       if (search !== null) {
-        const booksByPublisher = await book
+        const booksByPublisher = book
           .find({
             editora: search.publisher,
             titulo: search.title,
@@ -56,7 +39,9 @@ export class BookController {
           })
           .populate("autor")
 
-        response.status(200).json(booksByPublisher)
+        request.result = booksByPublisher
+
+        next()
       } else {
         response.status(200).json([])
       }
