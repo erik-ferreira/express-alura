@@ -1,14 +1,31 @@
 import { book } from "../models/book.js"
 import { author } from "../models/author.js"
 
-// import { processBooks } from "../utils/books.js"
+import { ErrorRequest } from "../errors/ErrorRequest.js"
 
 export class BookController {
   static async listBooks(_, response, next) {
     try {
-      const books = await book.find({})
+      const { take = 5, page = 1, ordination = "_id:-1" } = request.query
+      const [order, ordem] = ordination.split(":")
 
-      response.status(200).json(books)
+      take = parseInt(take)
+      page = parseInt(page)
+      ordem = parseInt(ordem)
+
+      if (take > 0 && page > 0) {
+        const books = await book
+          .find({})
+          .sort({ [order]: ordem })
+          .skip((page - 1) * take)
+          .limit(take)
+          .populate("autor")
+          .exec()
+
+        return response.status(200).json(books)
+      }
+
+      next(new ErrorRequest())
     } catch (error) {
       next(error)
     }
